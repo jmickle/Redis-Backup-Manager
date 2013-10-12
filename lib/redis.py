@@ -4,16 +4,18 @@ import os
 import sys
 import time
 import datetime
+import boto
 
 class Backup:
         
-    def __init__(self, server_name, port, save_directory=None, prefix=None, dbFileName=None):
+    def __init__(self, server_name, port, save_directory, dbFileName, aws, prefix=None):
         self.server_name = server_name
         self.port = port
         self.save_directory = save_directory
         self.prefix = prefix
         self.rconn = redis.StrictRedis(host=self.server_name, port=self.port)
         self.dbFileName = dbFileName
+        self.aws = aws
     
     def run(self):
         if self.checkRunningSave() == False:
@@ -46,27 +48,51 @@ class Backup:
 
     def saveFile(self):
         d = datetime.datetime.now()
+        now = d.strftime("%Y%m%d%H%M")
+        newSaveDir = os.path.join(self.save_directory, now)
         
         if self.prefix is not None:
-            newFileName = self.prefix + "-" + d.strftime("%Y%m%d%H%M") + ".rdb"
+            newFileName = self.prefix + "-" + now + ".rdb"
+            logging.debug("New file name is %s" % newFileName)
         else:
-            newFileName = self.server_name + "-" + d.strftime("%Y%m%d%H%M") + ".rdb"
+            newFileName = self.server_name + "-" + now + ".rdb"
+            logging.debug("New file name is %s" % newFileName)
         
         try:            
             os.chdir(self.save_directory)
-            os.rename(self.dbFileName, newFileName)
+            logging.debug("Creating directory: %s" % newSaveDir)
+            os.mkdir(newSaveDir)
+            logging.debug("Moving %s to file: %s" % (self.dbFileName, os.path.join(newSaveDir, newFileName)))
+            os.rename(self.dbFileName, os.path.join(newSaveDir, newFileName))
+            logging.debug("Archiving...")
+            self.archiveArtifact(newSaveDir, newFileName)
         except:
             logging.error("Error encountered during file operations!\n %s")
             sys.exit(1)
             self.__archiveArtifact()
         
         
-    def __archiveArtifact(self):
-        pass
+    def archiveArtifact(self, dir, artifact):
+        os.chdir(dir)
+        try:
+            os.system("split -b500m " + artifact)
+        except:
+            logging.error("Error splitting file!")
+            sys.exit(2)
         
+        files = os.listdir(dir)
+        
+        conn = boto.connect_s3(aws_access_key_id=self.aws['aws_access_key'], aws_secret_access_key=self.aws['aws_secret_key'])
+        bucket = conn.lookup(self.aws['s3_bucket'])
+        
+        mp = bucket.initiate_multipart_upload(artifact)
 
-
-
+        i = 0
+        while i < len(files):
+            logging.debug("Trying to upload %s" % files[i])
+            fp = open(files[i], 'rb')
+            mp.upload_part_from_file(fp, i)
+            i += 1
 
 
         
