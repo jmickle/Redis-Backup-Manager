@@ -1,0 +1,8 @@
+#Better handling of options
+#check if options are empty or exist
+#add option configs for command line execution
+#build reporting engine
+#build chef recipes 
+#more error checking around the artifact section
+#refactor artifacts into its own class methods
+#algorithmically handle the file splitting.

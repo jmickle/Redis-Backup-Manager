@@ -3,7 +3,7 @@
 import sys, time, os
 import logging
 from lib.daemon import daemon
-from lib.redis import Backup
+from lib.backup import Backup
 from lib.config import Config
 
 class BackupDaemon(daemon):
@@ -29,13 +29,14 @@ class BackupDaemon(daemon):
         
         
         while True:
-            loggind.debug("Backup process starting...")
-            for server in servers:
-                if server['prefix'] == "" or server['prefix'] == "none":
+            logging.debug("Backup process starting...")
+            for server, value in servers.iteritems():
+                logging.debug(value)
+                if value['prefix'] == 'none':
                     prefix = None
                 
-                job = Backup(server_name=server['hostname'], port=server['port'], save_directory=server['redis_save_dir'],
-                             dbFileName=server['redis_db_name'],aws=awsconf,prefix=prefix)
+                job = Backup(server_name=value['hostname'], port=int(value['port']), save_directory=value['redis_save_dir'],
+                             dbFileName=value['redis_db_name'],aws=awsconf,prefix=prefix)
                 job.run()
                 
             time.sleep(30)

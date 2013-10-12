@@ -5,6 +5,7 @@ import sys
 import time
 import datetime
 import boto
+import glob
 
 class Backup:
         
@@ -75,12 +76,13 @@ class Backup:
     def archiveArtifact(self, dir, artifact):
         os.chdir(dir)
         try:
-            os.system("split -b500m " + artifact)
+            os.system("split -b500m " + artifact + " backup.")
         except:
             logging.error("Error splitting file!")
             sys.exit(2)
         
-        files = os.listdir(dir)
+        files = glob.glob("backup.*")
+        logging.debug("got files %s" % files)
         
         conn = boto.connect_s3(aws_access_key_id=self.aws['aws_access_key'], aws_secret_access_key=self.aws['aws_secret_key'])
         bucket = conn.lookup(self.aws['s3_bucket'])
