@@ -87,14 +87,23 @@ class Backup:
         conn = boto.connect_s3(aws_access_key_id=self.aws['aws_access_key'], aws_secret_access_key=self.aws['aws_secret_key'])
         bucket = conn.lookup(self.aws['s3_bucket'])
         
-        mp = bucket.initiate_multipart_upload(artifact)
+        mp = bucket.initiate_multipart_upload(self.server_name +"/" + artifact)
 
         i = 0
+        filenum = 1
         while i < len(files):
             logging.debug("Trying to upload %s" % files[i])
             fp = open(files[i], 'rb')
-            mp.upload_part_from_file(fp, i)
+            mp.upload_part_from_file(fp, filenum)
+            fp.close()
+            
             i += 1
-
+            filenum += 1
+            
+        for part in mp:
+            logging.debug(part)
+        
+        logging.debug("Upload complete")
+        mp.complete_upload()
 
         
