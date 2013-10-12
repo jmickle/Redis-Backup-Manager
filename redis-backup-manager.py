@@ -5,7 +5,6 @@ import logging
 from lib.daemon import daemon
 from lib.redis import Backup
 from lib.config import Config
-import lib.archive
 
 class BackupDaemon(daemon):
     
