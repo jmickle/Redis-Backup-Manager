@@ -34,7 +34,8 @@ class BackupDaemon(daemon):
                 logging.debug(value)
                 if value['prefix'] == 'none':
                     prefix = None
-                
+                else:
+                    prefix = value['prefix']
                 job = Backup(server_name=value['hostname'], port=int(value['port']), save_directory=value['redis_save_dir'],
                              dbFileName=value['redis_db_name'],aws=awsconf,prefix=prefix)
                 job.run()

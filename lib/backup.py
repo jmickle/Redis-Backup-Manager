@@ -43,10 +43,16 @@ class Backup:
         
     def checkRunningSave(self):
         info = self.rconn.info()
-        if info['rdb_bgsave_in_progress'] == 1:
-            return True
+        if info['redis_version'] >= '2.6':
+            if info['rdb_bgsave_in_progress'] == 1:
+                return True
+            else:
+                return False
         else:
-            return False
+            if info['bgsave_in_progress'] == 1:
+                return True
+            else:
+                return False
 
     def saveFile(self):
         d = datetime.datetime.now()
