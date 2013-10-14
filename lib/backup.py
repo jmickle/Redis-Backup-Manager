@@ -105,5 +105,8 @@ class Backup:
         
         logging.debug("Upload complete")
         mp.complete_upload()
+        
+        #Delete backups to not fill up disk space
+        os.unlink(dir)
 
         
