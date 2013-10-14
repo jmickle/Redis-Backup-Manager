@@ -6,6 +6,7 @@ import time
 import datetime
 import boto
 import glob
+import shutil
 
 class Backup:
         
@@ -107,6 +108,7 @@ class Backup:
         mp.complete_upload()
         
         #Delete backups to not fill up disk space
-        os.unlink(dir)
+        os.chdir("../")
+        shutil.rmtree(dir)
 
         
