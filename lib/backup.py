@@ -20,7 +20,7 @@ class Backup:
         self.aws = aws
     
     def run(self):
-        #TODO: be safer here this could be a problem later. SHou
+        #TODO: be safer here this could be a problem later.
         lastSave = self.rconn.lastsave()
         self.rconn.bgsave()
         
