@@ -20,26 +20,22 @@ class Backup:
         self.aws = aws
     
     def run(self):
-        if self.checkRunningSave() == False:
-            logging.debug("no backup running")
-            lastSave = self.rconn.lastsave()
-            self.rconn.bgsave()
-            
-            while True:
-                if self.checkRunningSave() == True:
-                    logging.debug("BGSave still running.")
-                    time.sleep(10)
+        #TODO: be safer here this could be a problem later. SHou
+        lastSave = self.rconn.lastsave()
+        self.rconn.bgsave()
+        
+        while True:
+            if self.checkRunningSave() == True:
+                logging.debug("BGSave still running.")
+                time.sleep(10)
+            else:
+                tmpLastSave = self.rconn.lastsave()
+                if lastSave < tmpLastSave:
+                    self.saveFile()
+                    break
                 else:
-                    tmpLastSave = self.rconn.lastsave()
-                    if lastSave < tmpLastSave:
-                        self.saveFile()
-                        break
-                    else:
-                        logging.error("Last save time error")
-                        break
-            
-        else:
-            logging.info("RDB Save already processing.")
+                    logging.error("Last save time error")
+                    break
         
     def checkRunningSave(self):
         info = self.rconn.info()
