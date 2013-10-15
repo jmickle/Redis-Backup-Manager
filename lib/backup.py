@@ -20,9 +20,12 @@ class Backup:
         self.aws = aws
     
     def run(self):
-        #TODO: be safer here this could be a problem later.
-        lastSave = self.rconn.lastsave()
-        self.rconn.bgsave()
+        if self.checkRunningSave() == True:
+            logging.info('BGSave currently running, wont start another....')
+            lastSave = self.rconn.lastsave()
+        else:
+            lastSave = self.rconn.lastsave()
+            self.rconn.bgsave()
         
         while True:
             if self.checkRunningSave() == True:
@@ -85,6 +88,7 @@ class Backup:
             sys.exit(2)
         
         files = glob.glob("backup.*")
+        files.sort()
         logging.debug("got files %s" % files)
         
         conn = boto.connect_s3(aws_access_key_id=self.aws['aws_access_key'], aws_secret_access_key=self.aws['aws_secret_key'])
