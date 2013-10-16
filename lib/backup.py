@@ -7,6 +7,7 @@ import datetime
 import boto
 import glob
 import shutil
+import s3tools
 
 class Backup:
         
@@ -70,51 +71,17 @@ class Backup:
             logging.debug("Creating directory: %s" % newSaveDir)
             os.mkdir(newSaveDir)
             logging.debug("Moving %s to file: %s" % (self.dbFileName, os.path.join(newSaveDir, newFileName)))
-            os.rename(self.dbFileName, os.path.join(newSaveDir, newFileName))
+            shutil.copy2(self.dbFileName, os.path.join(newSaveDir, newFileName))
             logging.debug("Archiving...")
-            self.archiveArtifact(newSaveDir, newFileName)
+            source_file = os.path.join(newSaveDir, newFileName)
+            keyname = self.server_name +"/" + newFileName
+            #self.archiveArtifact(newSaveDir, newFileName)
+            s3tools.upload(self.aws['s3_bucket'], self.aws['aws_access_key'], self.aws['aws_secret_key'], source_file, keyname)
+            shutil.rmtree(newSaveDir)
         except:
             logging.error("Error encountered during file operations!\n %s")
             sys.exit(1)
             self.__archiveArtifact()
         
-        
-    def archiveArtifact(self, dir, artifact):
-        os.chdir(dir)
-        try:
-            os.system("split -b500m " + artifact + " backup.")
-        except:
-            logging.error("Error splitting file!")
-            sys.exit(2)
-        
-        files = glob.glob("backup.*")
-        files.sort()
-        logging.debug("got files %s" % files)
-        
-        conn = boto.connect_s3(aws_access_key_id=self.aws['aws_access_key'], aws_secret_access_key=self.aws['aws_secret_key'])
-        bucket = conn.lookup(self.aws['s3_bucket'])
-        
-        mp = bucket.initiate_multipart_upload(self.server_name +"/" + artifact)
-
-        i = 0
-        filenum = 1
-        while i < len(files):
-            logging.debug("Trying to upload %s" % files[i])
-            fp = open(files[i], 'rb')
-            mp.upload_part_from_file(fp, filenum)
-            fp.close()
-            
-            i += 1
-            filenum += 1
-            
-        for part in mp:
-            logging.debug(part)
-        
-        logging.debug("Upload complete")
-        mp.complete_upload()
-        
-        #Delete backups to not fill up disk space
-        os.chdir("../")
-        shutil.rmtree(dir)
 
         
