@@ -5,7 +5,7 @@ class daemon:
 
     Usage: subclass the daemon class and override the run() method."""
 
-    def __init__(self, pidfile, stdin='/dev/null', stdout='/Users/jonathanmickle/Documents/workspace/redis-backup-manager/log/out.log', stderr='/Users/jonathanmickle/Documents/workspace/redis-backup-manager/log/err.log'): 
+    def __init__(self, pidfile, stdin='/dev/null', stdout=os.path.join(os.getcwd(), "log", "out.log"), stderr=os.path.join(os.getcwd(), "log", "err.log")): 
         self.pidfile = pidfile
         self.stdout = stdout
         self.stderr = stderr

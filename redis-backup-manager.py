@@ -40,7 +40,7 @@ class BackupDaemon(daemon):
                              dbFileName=value['redis_db_name'],aws=awsconf,prefix=prefix)
                 job.run()
                 
-            time.sleep(30)
+            time.sleep(3600)
 
 if __name__ == "__main__":
         logging.basicConfig(filename='log/app.log', level=logging.DEBUG)
