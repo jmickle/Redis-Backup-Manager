@@ -23,10 +23,11 @@ class BackupDaemon(daemon):
             servers[server] = conf.getSectionDetails(server)
         
         awsconf = conf.getSectionDetails("aws")
-        
+        sensuconf = conf.getSectionDetails("sensu")
+
         logging.debug(servers)
         logging.debug(awsconf)
-        
+        logging.debug(sensuconf)
         
         while True:
             logging.debug("Backup process starting...")
