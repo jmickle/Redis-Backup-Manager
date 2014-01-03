@@ -8,10 +8,12 @@ import boto
 import glob
 import shutil
 import s3tools
+import socket
+import json
 
 class Backup:
         
-    def __init__(self, server_name, port, save_directory, dbFileName, aws, prefix=None):
+    def __init__(self, sensuconf, server_name, port, save_directory, dbFileName, aws, prefix=None):
         self.server_name = server_name
         self.port = port
         self.save_directory = save_directory
@@ -19,7 +21,8 @@ class Backup:
         self.rconn = redis.StrictRedis(host=self.server_name, port=self.port)
         self.dbFileName = dbFileName
         self.aws = aws
-    
+        self.sensuconf = sensuconf
+
     def run(self):
         if self.checkRunningSave() == True:
             logging.info('BGSave currently running, wont start another....')
@@ -38,6 +41,7 @@ class Backup:
                     self.saveFile()
                     break
                 else:
+                    self.alertSensu("Last Save time error!", self.server_name)
                     logging.error("Last save time error")
                     break
         
@@ -80,8 +84,15 @@ class Backup:
             shutil.rmtree(newSaveDir)
         except:
             logging.error("Error encountered during file operations!\n %s")
+            self.alertSensu("Redis File Operations Failed!", self.server_name)
             sys.exit(1)
             self.__archiveArtifact()
         
+    def alertSensu(message, server_name):
+        alert = {"name":server_name,"type":"check","output": message,"status":2,"handler":"pagerduty"}
+        UDP_IP = self.sensuconf['sensu_agent_host']
+        UDP_PORT = self.sensuconf['sensu_agent_port']
+        sock - socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.sendto(json.dumps(alert), (UDP_IP,UDP_PORT))
 
         
