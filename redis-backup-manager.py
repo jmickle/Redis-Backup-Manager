@@ -38,7 +38,7 @@ class BackupDaemon(daemon):
                 #     prefix = None
                 # else:
                 #     prefix = value['prefix']
-                job = Backup(server_name=value['hostname'], port=int(value['port']), save_directory=value['redis_save_dir'],
+                job = Backup(sensuconf=sensuconf, server_name=value['hostname'], port=int(value['port']), save_directory=value['redis_save_dir'],
                              dbFileName=value['redis_db_name'],aws=awsconf,prefix=prefix)
                 job.run()
                 
