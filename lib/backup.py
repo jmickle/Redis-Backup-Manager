@@ -88,7 +88,7 @@ class Backup:
             sys.exit(1)
             self.__archiveArtifact()
         
-    def alertSensu(message, server_name):
+    def alertSensu(self, message, server_name):
         alert = {"name":server_name,"type":"check","output": message,"status":2,"handler":"pagerduty"}
         UDP_IP = self.sensuconf['sensu_agent_host']
         UDP_PORT = self.sensuconf['sensu_agent_port']
