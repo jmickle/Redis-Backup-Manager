@@ -27,19 +27,19 @@ servers=server1,server2,server3
 ```
 
 an AWS block must also always be present, this sets up the AWS credentials and bucket.
-`
+```
 [aws]
 aws_access_key=aaaa
 aws_secret_key=bbbbb
 s3_bucket=ccccc
-`
+```
 
 For each server listed in servers, a server block with that title must be present that specifies the configuration.
-`
+```
 [server1]
 hostname=localhost #this is the host name to connect to
 port=6379 # what redis port
 redis_db_name=dump.rdb # what will the redis conf name the file when it saves
 redis_save_dir=/tmp # redis data dir
 prefix=none # if left as none it will use hostname and port name as a prefix, else can be used to specify a name
-`
+```
