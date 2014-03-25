@@ -21,10 +21,10 @@ Configuration
 --------------
 a default block must always be present this sets the server blocks to look for an config settings
 
-`
+```
 [default]
 servers=server1,server2,server3
-`
+```
 
 an AWS block must also always be present, this sets up the AWS credentials and bucket.
 `
