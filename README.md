@@ -11,13 +11,12 @@ The next problem was save sets were too unpredictable in our cases, when we woul
 That is when this project was written, we needed a process to do abstract the backup process for us, manage it and do it on a timed basis so that it would handle without too much overhead on the production environment. 
 
 Redis Backup manager was written very dirty and quickly in python to basically perform the following tasks:
-	```
-	- Initiate a backup on a timed bases.
-	- compress the backup into a archived date
-	- upload this backup to s3
-	- repeat this for multiple instances of redis on a box
-	- sleep for a duration between backups 
-	```
+* Initiate a backup on a timed bases.
+* compress the backup into a archived date
+* upload this backup to s3
+* repeat this for multiple instances of redis on a box
+* sleep for a duration between backups 
+
 
 Configuration
 --------------
