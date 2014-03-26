@@ -92,7 +92,7 @@ class Backup:
         alert = {"name":server_name,"type":"check","output": message,"status":2,"handler":"pagerduty"}
         UDP_IP = self.sensuconf['sensu_agent_host']
         UDP_PORT = self.sensuconf['sensu_agent_port']
-        sock - socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.sendto(json.dumps(alert), (UDP_IP,UDP_PORT))
 
         
